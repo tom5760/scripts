@@ -1,0 +1,24 @@
+#!/bin/bash
+# adb_all - Runs an Android "adb" command over all connected devices and
+#           emulators
+# Author: Tom Wambold <tom5760@gmail.com>
+#
+# Usage is the same "adb".  Note that the command is exec'ed through the shell,
+# so you can make use of the "$i" variable to keep track of what device you are
+# talking to.
+# 
+# Example: Set the IP addresses of all devices to consecutive addresses.  Note
+#          the single quotes around the command to prevent the shell from
+#          expanding the expression.
+#
+#   adb_all shell 'ifconfig usb0 192.168.1.$(( $i + 1 )) netmask 255.255.255.0'
+
+adb start-server
+i=0
+for device in $(adb devices | tail -n +2 | awk '{print $1}')
+do
+    echo "Device: $device"
+    eval adb -s $device $@
+    echo
+    i=$((i + 1))
+done

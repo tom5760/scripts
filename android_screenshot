@@ -1,0 +1,8 @@
+#!/bin/sh
+# android_screenshot - Pulls a screenshot from a connected device or emulator.
+# Author: Tom Wambold <tom5760@gmail.com>
+#
+# Usage: android_screenshot foo.png
+
+adb pull /dev/graphics/fb0 /tmp/fb0
+ffmpeg -vframes 1 -vcodec rawvideo -f rawvideo -pix_fmt rgb565 -s 320x480 -i /tmp/fb0 -f image2 -vcodec png $1
