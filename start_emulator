@@ -11,9 +11,12 @@ EMULATOR="emu$ID"
 HEX=$(python -c "print('{0:02x}'.format($ID))")
 
 export LD_LIBRARY_PATH=/home/tom/programs/android-sdk/tools/lib
+
 sudo ip tuntap add "$EMULATOR" mode tap
 
-sudo -E emulator -avd x86-17-b -qemu -m 512 -enable-kvm -nographic \
+sleep 2
+
+sudo -E emulator -avd $EMULATOR -qemu -m 512 -enable-kvm -nographic \
     -net nic,vlan=1 -net user,vlan=1,hostname="$EMULATOR" \
     -net nic,vlan=2,macaddr=52:54:00:12:34:$HEX \
     -net tap,ifname=$EMULATOR,script=no,vlan=2
