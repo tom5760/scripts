@@ -6,19 +6,31 @@ then
     exit 1
 fi
 
+if [ -z "$ANDROID_HOME" ]
+then
+    echo "Set the ANDROID_HOME environment variable to the location of your Android SDK"
+    exit 1
+fi
+
 ID="$1"
 EMULATOR="emu$ID"
 HEX=$(python -c "print('{0:02x}'.format($ID))")
 
-export LD_LIBRARY_PATH=/home/tom/programs/android-sdk/tools/lib
+export LD_LIBRARY_PATH=$ANDROID_HOME/tools/lib
 
+# If you want more interfaces per emulator, add them here with unique names,
+# and attach them to the emulator by copying the two "-net" lines below.
 sudo ip tuntap add "$EMULATOR" mode tap
 
 sleep 2
 
-sudo -E emulator -avd $EMULATOR -qemu -m 512 -enable-kvm -nographic \
-    -net nic,vlan=1 -net user,vlan=1,hostname="$EMULATOR" \
-    -net nic,vlan=2,macaddr=52:54:00:12:34:$HEX \
-    -net tap,ifname=$EMULATOR,script=no,vlan=2
+# If you want to actually see the emulator, and not just interact with it over
+# something like ADB, remove the "nographic" flag here.
+sudo -E emulator -avd $EMULATOR -qemu -m 512 -enable-kvm \
+    -nographic \
+    -net nic,vlan=1,macaddr=52:52:00:12:34:$HEX \
+    -net user,vlan=1,hostname="$EMULATOR" \
+    -net nic,vlan=2,macaddr=52:54:00:12:35:$HEX \
+    -net tap,ifname=${EMULATOR},script=no,vlan=2
 
 sudo ip tuntap del "$EMULATOR" mode tap
