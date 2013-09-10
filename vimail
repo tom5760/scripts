@@ -1,0 +1,17 @@
+#!/bin/sh
+
+DRAFT_DIR="$HOME/.drafts"
+
+mkdir -p "$DRAFT_DIR"
+
+DRAFT=$(mktemp --tmpdir="$DRAFT_DIR")
+
+vim -c "set ft=mail" -c "set spell" "$DRAFT"
+
+echo "Delete draft? [y/N]"
+read INPUT
+
+if [ "$INPUT" = "y" ]
+then
+    rm "$DRAFT"
+fi
