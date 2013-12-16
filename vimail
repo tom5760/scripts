@@ -6,7 +6,11 @@ mkdir -p "$DRAFT_DIR"
 
 DRAFT=$(mktemp --tmpdir="$DRAFT_DIR")
 
+xclip -o -selection clipboard >> "$DRAFT"
+
 vim -c "set ft=mail" -c "set spell" "$DRAFT"
+
+xclip -i -selection clipboard < "$DRAFT"
 
 echo "Delete draft? [y/N]"
 read INPUT
