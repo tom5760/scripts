@@ -1,0 +1,16 @@
+#!/bin/sh
+# pw - Screen power toggle.
+# Toggles screensavers, etc.
+
+if xscreensaver-command -version &> /dev/null
+then
+    echo Disabling screensaver
+    xset s off
+    xset -dpms
+    xscreensaver-command -exit > /dev/null
+else
+    echo Enabling screensaver
+    xset s on
+    xset +dpms
+    xscreensaver -nosplash &
+fi
