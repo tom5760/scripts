@@ -1,4 +1,4 @@
 #!/bin/sh
 # Simple shortcut to run chrome with a different profile directory.
 # Also, disable checking for CORS requests with --disable-web-security
-exec chromium --user-data-dir=$HOME/programs/dev-chromium
+exec chromium --user-data-dir=$HOME/programs/dev-chromium $@
