@@ -1,0 +1,38 @@
+#!/usr/bin/env python3
+# Serve a directory over SSL with a temporary self-signed certificate.
+
+import http.server
+import ssl
+import sys
+import tempfile
+import subprocess
+
+DEFAULT_ADDRESS = 'localhost'
+DEFAULT_PORT = 4000;
+
+def generate_certificate(path):
+    args = ['openssl', 'req', '-new', '-x509', '-keyout', path, '-out', path,
+            '-days', '365', '-nodes', '-subj', '/C=US']
+
+    print('Generating certificate with:', ' '.join(args))
+    subprocess.check_call(args,
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+    return path
+
+def main(argv):
+    with tempfile.NamedTemporaryFile(suffix='.pem') as certfile:
+        generate_certificate(certfile.name)
+
+        address = (DEFAULT_ADDRESS, DEFAULT_PORT)
+        server = http.server.HTTPServer(
+                address, http.server.SimpleHTTPRequestHandler)
+
+        server.socket = ssl.wrap_socket(server.socket,
+                certfile=certfile.name, server_side=True)
+
+        print('Listening on:', address[0], 'Port:', address[1])
+        server.serve_forever()
+
+if __name__ == '__main__':
+    sys.exit(main(sys.argv))
