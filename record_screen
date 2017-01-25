@@ -1,24 +1,50 @@
 #!/bin/sh
+# Install slop: https://github.com/naelstrof/slop
+#     pacman -S slop
 # Run this like: ./record_screen moviename
 
-# Get this from xrandr or something
-resolution=1920x1080
+if [ -z "$1" ]
+then
+  echo "provide output name"
+  exit 1
+fi
 
-# Change the last two numbers to move the top-left corner of the recording
-# rectangle.  i.e. :0.0+600,300 would record offset 600 x, 300 y.  The first
-# numbers is for the X display, which is probably always 0.
-offset=:0.0+0,0
+eval $(slop)
+
+if [ "$Cancel" == "true" ]
+then
+  echo "selection canceled"
+  exit 0
+fi
 
 cmd="ffmpeg \
-    -f x11grab \
-    -s $resolution \
-    -i $offset \
-    -c:v libx264 \
-    -preset ultrafast \
-    -threads 0
-    $1.mkv"
+  -f x11grab \
+  -s ${W}x${H} \
+  -i :0.0+${X},${Y} \
+  -framerate 15 \
+  $1"
+
 echo $cmd
 exec $cmd
+
+# Get this from xrandr or something
+#resolution=1920x1080
+#
+## Change the last two numbers to move the top-left corner of the recording
+## rectangle.  i.e. :0.0+600,300 would record offset 600 x, 300 y.  The first
+## numbers is for the X display, which is probably always 0.
+#offset=:0.0+0,0
+#
+#cmd="ffmpeg \
+#    -f x11grab \
+#    -s $resolution \
+#    -i $offset \
+#    -c:v libx264 \
+#    -preset ultrafast \
+#    -threads 0
+#    $1.mkv"
+#echo $cmd
+#exec $cmd
 
 # IF YOU NEED TO RECORD AUDIO FROM YOUR MICROPHONE, ADD THESE OPTIONS
 
