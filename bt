@@ -1,43 +1,84 @@
-#!/bin/sh
+#!/usr/bin/env fish
 #
 # Swap Bluetooth headset profiles
 #
 # Based a bit on:
 #   https://askubuntu.com/a/1009156
 
-CARD=$(pacmd list-cards | grep 'bluez_card' | cut -c 9-36)
+function reset
+  rfkill block bluetooth
+  sleep 0.1
+  rfkill unblock bluetooth
+end
 
-if [ "$1" = "" -o "$1" = "toggle" ]
-then
+function speak
+  echo 'Switching to HSP/HFP profile...'
+  set_profile headset_head_unit
+  sleep 0.1
+  set_sink
+  set_source
+end
+
+function listen
+  echo 'Switching to A2DP profile...'
+  set_profile a2dp_sink
+  sleep 0.1
+  set_sink
+end
+
+function toggle
   if pacmd list-cards | grep 'A2DP' | grep 'available: yes' 2>&1 > /dev/null
-  then
-    $0 speak
+    speak
 
-  elif pacmd list-cards | grep 'HSP/HFP' | grep 'available: yes' 2>&1 > /dev/null
-  then
-    $0 listen
+  else if pacmd list-cards | grep 'HSP/HFP' | grep 'available: yes' 2>&1 > /dev/null
+    listen
 
   else
     echo 'No Bluetooth profiles found.'
     exit 1
-  fi
-fi
+  end
+end
 
-if [ "$1" = "reset" ]
-then
-  rfkill block bluetooth
-  sleep 0.1
-  rfkill unblock bluetooth
-fi
+function get_card
+  pacmd list-cards | grep 'bluez_card' | cut --characters=9- | head --bytes -2
+end
 
-if [ "$1" = "speak" ]
-then
-  echo "Switching to HSP/HFP profile..."
-  pacmd set-card-profile "$CARD" headset_head_unit
-fi
+function set_sink
+  set --local sink (pacmd list-sinks | grep 'bluez_sink' | cut --characters=9- | head --bytes -2)
+  pacmd set-default-sink "$sink"
 
-if [ "$1" = "listen" ]
-then
-  echo "Switching to A2DP profile..."
-  pacmd set-card-profile "$CARD" a2dp_sink
-fi
+  for i in (pacmd list-sink-inputs | grep 'index' | cut --characters=12-)
+    pacmd move-sink-input "$i" "$sink"
+  end
+end
+
+function set_source
+  set --local source (pacmd list-sources | grep --only-matching 'bluez_source\..*\.headset_head_unit')
+  pacmd set-default-source "$source"
+
+  for i in (pacmd list-source-outputs | grep 'index' | cut --characters=12-)
+    pacmd move-source-output "$i" "$source" 2> /dev/null
+  end
+end
+
+function set_profile --argument-names profile
+  pacmd set-card-profile (get_card) $profile 2> /dev/null
+end
+
+if test (count $argv) -lt 1
+  toggle
+else
+  switch $argv[1]
+    case reset
+      reset
+
+    case speak
+      speak
+
+    case listen
+      listen
+
+    case toggle '*'
+      toggle
+  end
+end
