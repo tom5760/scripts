@@ -1,0 +1,43 @@
+#!/bin/sh
+#
+# Swap Bluetooth headset profiles
+#
+# Based a bit on:
+#   https://askubuntu.com/a/1009156
+
+CARD=$(pacmd list-cards | grep 'bluez_card' | cut -c 9-36)
+
+if [ "$1" = "" -o "$1" = "toggle" ]
+then
+  if pacmd list-cards | grep 'A2DP' | grep 'available: yes' 2>&1 > /dev/null
+  then
+    $0 speak
+
+  elif pacmd list-cards | grep 'HSP/HFP' | grep 'available: yes' 2>&1 > /dev/null
+  then
+    $0 listen
+
+  else
+    echo 'No Bluetooth profiles found.'
+    exit 1
+  fi
+fi
+
+if [ "$1" = "reset" ]
+then
+  rfkill block bluetooth
+  sleep 0.1
+  rfkill unblock bluetooth
+fi
+
+if [ "$1" = "speak" ]
+then
+  echo "Switching to HSP/HFP profile..."
+  pacmd set-card-profile "$CARD" headset_head_unit
+fi
+
+if [ "$1" = "listen" ]
+then
+  echo "Switching to A2DP profile..."
+  pacmd set-card-profile "$CARD" a2dp_sink
+fi
