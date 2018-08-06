@@ -1,12 +1,8 @@
 #!/bin/sh
 # Script to update archlinux system.
 
-echo "packer -Syu"
-packer -Syu
-echo
-
-echo "abs"
-sudo abs
+echo "pacman -Syu"
+sudo pacman -Syu
 echo
 
 echo "pkgfile -u"
@@ -21,6 +17,10 @@ echo "updatedb"
 sudo updatedb
 echo
 
+echo "AUR updates:"
+cower -u
+
+echo
 echo "Configs to merge:"
 locate "*.pacsave"
 locate "*.pacnew"
