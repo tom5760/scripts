@@ -9,7 +9,7 @@ then
   exit 1
 fi
 
-eval $(slop)
+eval $(slop --format="W=%w; H=%h; X=%x; Y=%y;")
 
 if [ "$Cancel" == "true" ]
 then
