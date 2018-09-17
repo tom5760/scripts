@@ -18,7 +18,7 @@ sudo updatedb
 echo
 
 echo "AUR updates:"
-cower -u
+cower --update --download --force
 
 echo
 echo "Configs to merge:"
