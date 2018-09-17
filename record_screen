@@ -17,11 +17,21 @@ then
   exit 0
 fi
 
+# Record just the screen
+#cmd="ffmpeg \
+#  -f x11grab \
+#  -s ${W}x${H} \
+#  -i :0.0+${X},${Y} \
+#  -framerate 15 \
+#  $1"
+
+# Record the screen and audio output
 cmd="ffmpeg \
   -f x11grab \
   -s ${W}x${H} \
   -i :0.0+${X},${Y} \
-  -framerate 15 \
+  -f pulse \
+  -i bluez_sink.00_16_94_28_73_FC.a2dp_sink.monitor \
   $1"
 
 echo $cmd
