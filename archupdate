@@ -1,26 +1,33 @@
 #!/bin/sh
 # Script to update archlinux system.
 
+if [ "$(whoami)" != "root" ]
+then
+  sudo $0
+
+  echo "AUR updates:"
+  cower --update --download --force
+
+  echo
+  echo "Configs to merge:"
+  locate "*.pacsave"
+  locate "*.pacnew"
+
+  exit 0
+fi
+
 echo "pacman -Syu"
-sudo pacman -Syu
+pacman -Syu
 echo
 
 echo "pkgfile -u"
-sudo pkgfile -u
+pkgfile -u
 echo
 
 echo "pacman -Scc"
-sudo pacman -Scc
+pacman -Scc
 echo
 
 echo "updatedb"
-sudo updatedb
+updatedb
 echo
-
-echo "AUR updates:"
-cower --update --download --force
-
-echo
-echo "Configs to merge:"
-locate "*.pacsave"
-locate "*.pacnew"
