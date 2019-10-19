@@ -1,12 +1,28 @@
 #!/bin/sh
 # Script to update archlinux system.
 
+update_aur() {
+  echo "AUR updates:"
+
+  auracle sync
+
+  mkdir -p ~/downloads/packages
+
+  pushd ~/downloads/packages
+  auracle clone $(auracle sync | cut -d' ' -f1)
+  popd
+}
+
 if [ "$(whoami)" != "root" ]
 then
   sudo $0
 
-  echo "AUR updates:"
-  cower --update --download --force
+  update_aur
+
+  echo
+  echo "Firmware updates:"
+  fwupdmgr refresh
+  fwupdmgr get-updates
 
   echo
   echo "Configs to merge:"
