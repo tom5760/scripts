@@ -2,10 +2,21 @@
 # swapws - Swaps workspaces in i3.
 # Arguments are pairs of workspaces to swap.  Can specify arbitrary number.
 
+wmmsg() {
+  case "$XDG_SESSION_TYPE" in
+    x11)
+      i3-msg $@ > /dev/null
+      ;;
+    wayland)
+      swaymsg $@ > /dev/null
+      ;;
+  esac
+}
+
 swap() {
-  i3-msg "rename workspace $1 to tmp" > /dev/null
-  i3-msg "rename workspace $2 to $1" > /dev/null
-  i3-msg "rename workspace tmp to $2" > /dev/null
+  wmmsg "rename workspace $1 to tmp"
+  wmmsg "rename workspace $2 to $1"
+  wmmsg "rename workspace tmp to $2"
 }
 
 if [ $# -lt 2 ]
