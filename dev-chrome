@@ -2,7 +2,7 @@
 # Simple shortcut to run chrome with a different profile directory.
 # Disable checking for CORS requests with --disable-web-security
 # Disable certificate checking with --ignore-certificate-errors
-exec google-chrome-stable --user-data-dir=$HOME/programs/dev-chrome $@
+#exec google-chrome-stable --user-data-dir=$HOME/programs/dev-chrome $@
 #exec google-chrome-stable --user-data-dir=$HOME/programs/dev-chrome --ignore-certificate-errors $@
-#exec chromium --user-data-dir=$HOME/programs/dev-chromium --remote-debugging-port=9222 $@
+exec chromium --user-data-dir=$HOME/programs/dev-chromium $@
 #exec chromium --user-data-dir=$HOME/programs/dev-chromium --disable-web-security $@
