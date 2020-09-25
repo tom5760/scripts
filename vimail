@@ -17,7 +17,7 @@ paste() {
       xclip -o -selection clipboard >> "$DRAFT"
       ;;
     wayland)
-      wl-paste --type 'text/plain' >> "$DRAFT"
+      wl-paste --type 'text/plain' | dos2unix >> "$DRAFT"
       ;;
   esac
 }
